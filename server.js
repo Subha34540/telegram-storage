@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const TelegramBot = require('node-telegram-bot-api');
@@ -7,49 +6,39 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
 const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: false });
 
 app.use(express.json());
 app.use(express.static('public'));
 
-const uploadDir = './uploads';
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-}
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, uploadDir),
-    filename: (req, file, cb) => {
-        const unique = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, unique + path.extname(file.originalname));
-    }
+// Multer - memory storage (Vercel ke liye)
+const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 4.5 * 1024 * 1024 } // Vercel 4.5MB limit
 });
 
-const upload = multer({
-    storage: storage,
-    limits: { fileSize: 50 * 1024 * 1024 }
-});
-
+// Home page
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Upload page
 app.get('/upload', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'upload.html'));
 });
 
+// QR Code
 app.get('/api/qr', async (req, res) => {
     try {
         const url = `${process.env.WEBSITE_URL}/upload`;
         const qr = await QRCode.toDataURL(url, { width: 400, margin: 2 });
-        res.json({ qr: qr, url: url });
+        res.json({ qr, url });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
+// Bot info
 app.get('/api/bot-info', async (req, res) => {
     try {
         const me = await bot.getMe();
@@ -59,13 +48,13 @@ app.get('/api/bot-info', async (req, res) => {
     }
 });
 
+// File upload
 app.post('/api/upload', upload.single('file'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file' });
         }
 
-        const filePath = req.file.path;
         const fileSize = (req.file.size / 1024 / 1024).toFixed(2);
         const time = new Date().toLocaleString('en-IN');
 
@@ -81,22 +70,23 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 📊 *Size:* ${fileSize} MB
 🕐 *Time:* ${time}`;
 
-        await bot.sendDocument(process.env.ADMIN_CHAT_ID, filePath, {
-            caption: caption,
-            parse_mode: 'Markdown'
-        });
+        // Send to Telegram using buffer
+        await bot.sendDocument(
+            process.env.ADMIN_CHAT_ID,
+            req.file.buffer,
+            {
+                caption: caption,
+                parse_mode: 'Markdown',
+                filename: req.file.originalname
+            }
+        );
 
-        fs.unlinkSync(filePath);
         res.json({ success: true, message: 'Upload successful!' });
     } catch (error) {
         console.error(error);
-        if (req.file && fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
-        }
         res.status(500).json({ error: error.message });
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server: http://localhost:${PORT}`);
-});
+// Export for Vercel
+module.exports = app;
