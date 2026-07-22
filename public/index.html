@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Storage</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🚀 Telegram Storage</h1>
+            <p class="subtitle">QR Scan karo aur files upload karo!</p>
 
+            <div class="info-box">
+                🤖 Bot: <strong id="botName">Loading...</strong>
+            </div>
+
+            <div class="qr-section">
+                <h3>📷 Upload QR Code</h3>
+                <div id="qrBox" class="qr-box">Loading...</div>
+                <p class="url" id="urlText"></p>
+            </div>
+
+            <div class="steps">
+                <h3>📋 Steps:</h3>
+                <ol>
+                    <li>QR Code scan karo</li>
+                    <li>Details bharo</li>
+                    <li>File upload karo</li>
+                    <li>Done! ✅</li>
+                </ol>
+            </div>
+
+            <button onclick="downloadQR()" class="btn">📥 Download QR</button>
+        </div>
+    </div>
+
+    <script>
+        fetch('/api/qr')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('qrBox').innerHTML = `<img src="${data.qr}" id="qrImg">`;
+                document.getElementById('urlText').textContent = data.url;
+                window.qrUrl = data.qr;
+            });
+
+        fetch('/api/bot-info')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('botName').textContent = '@' + data.username;
+            });
+
+        function downloadQR() {
+            const a = document.createElement('a');
+            a.href = window.qrUrl;
+            a.download = 'qr.png';
+            a.click();
+        }
+    </script>
+</body>
+</html>
