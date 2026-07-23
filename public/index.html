@@ -1,60 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Storage</title>
+    <title>🚀 Telegram Storage</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <div class="card">
-            <h1>🚀 Telegram Storage</h1>
-            <p class="subtitle">QR Scan karo aur files upload karo!</p>
+            <div class="header">
+                <div class="logo">🚀</div>
+                <h1>Telegram Storage</h1>
+                <p class="subtitle">QR Code scan karo aur files seedha Telegram pe!</p>
+            </div>
 
             <div class="info-box">
                 🤖 Bot: <strong id="botName">Loading...</strong>
             </div>
 
             <div class="qr-section">
-                <h3>📷 Upload QR Code</h3>
-                <div id="qrBox" class="qr-box">Loading...</div>
+                <h3>📷 Scan This QR Code</h3>
+                <div class="qr-box" id="qrBox">Loading QR Code...</div>
                 <p class="url" id="urlText"></p>
             </div>
 
             <div class="steps">
-                <h3>📋 Steps:</h3>
+                <h3>📋 Kaise kaam karta hai:</h3>
                 <ol>
-                    <li>QR Code scan karo</li>
-                    <li>Details bharo</li>
-                    <li>File upload karo</li>
-                    <li>Done! ✅</li>
+                    <li>QR Code scan karo (mobile camera se)</li>
+                    <li>Upload page khulega</li>
+                    <li>Apni details bharo</li>
+                    <li>File select karo (Max 4MB)</li>
+                    <li>Upload button dabao</li>
+                    <li>File seedha admin ke Telegram pe! ✅</li>
                 </ol>
             </div>
 
-            <button onclick="downloadQR()" class="btn">📥 Download QR</button>
+            <button onclick="downloadQR()" class="btn">
+                📥 Download QR Code
+            </button>
         </div>
     </div>
 
     <script>
+        // Load QR Code
         fetch('/api/qr')
             .then(r => r.json())
             .then(data => {
-                document.getElementById('qrBox').innerHTML = `<img src="${data.qr}" id="qrImg">`;
+                document.getElementById('qrBox').innerHTML = 
+                    `<img src="${data.qr}" alt="QR Code" style="max-width:250px;">`;
                 document.getElementById('urlText').textContent = data.url;
                 window.qrUrl = data.qr;
+            })
+            .catch(err => {
+                document.getElementById('qrBox').innerHTML = 
+                    '<p style="color:red;">QR load nahi hua</p>';
             });
 
+        // Load Bot Info
         fetch('/api/bot-info')
             .then(r => r.json())
             .then(data => {
                 document.getElementById('botName').textContent = '@' + data.username;
+            })
+            .catch(err => {
+                document.getElementById('botName').textContent = 'Bot offline';
             });
 
+        // Download QR
         function downloadQR() {
+            if (!window.qrUrl) {
+                alert('QR abhi load nahi hua, wait karo...');
+                return;
+            }
             const a = document.createElement('a');
             a.href = window.qrUrl;
-            a.download = 'qr.png';
+            a.download = 'telegram-storage-qr.png';
             a.click();
         }
     </script>
