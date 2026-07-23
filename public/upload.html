@@ -1,51 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload</title>
+    <title>📤 Upload Document</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <div class="card">
-            <h1>📤 Document Upload</h1>
-            <p class="subtitle">Apni details bharo aur file upload karo</p>
+            <div class="header">
+                <div class="logo">📤</div>
+                <h1>Upload Document</h1>
+                <p class="subtitle">Apni details bharo aur file upload karo. <br>Admin ko turant mil jayega!</p>
+            </div>
 
             <form id="form">
                 <div class="form-group">
-                    <label>👤 Naam *</label>
-                    <input type="text" name="userName" required placeholder="Apna naam">
+                    <label>👤 Apna Naam *</label>
+                    <input type="text" name="userName" required placeholder="Apna naam likho">
                 </div>
 
                 <div class="form-group">
-                    <label>📧 Email</label>
+                    <label>📧 Email Address</label>
                     <input type="email" name="userEmail" placeholder="email@example.com">
                 </div>
 
                 <div class="form-group">
-                    <label>📱 Phone</label>
+                    <label>📱 Phone Number</label>
                     <input type="tel" name="userPhone" placeholder="+91 9999999999">
                 </div>
 
                 <div class="form-group">
-                    <label>📝 Note</label>
-                    <textarea name="note" placeholder="Kuch likhna ho..."></textarea>
+                    <label>📝 Note (Optional)</label>
+                    <textarea name="note" placeholder="Kuch likhna ho toh yahan likho..."></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label>📁 File * (Max 50MB)</label>
+                    <label>📁 Select File * (Max 4MB)</label>
                     <div class="drop-zone" id="dropZone">
                         <input type="file" id="fileInp" required hidden>
-                        <div class="drop-content">
-                            <div class="icon">📁</div>
-                            <p id="fileTxt">Click ya Drop karo</p>
-                            <p class="filename" id="fileName"></p>
-                        </div>
+                        <div class="icon">📁</div>
+                        <p class="file-info" id="fileTxt">Click karo ya file yahan drop karo</p>
+                        <p class="filename" id="fileName"></p>
                     </div>
                 </div>
 
-                <button type="submit" id="btn" class="btn">🚀 Upload</button>
+                <button type="submit" id="btn" class="btn">
+                    🚀 Upload File
+                </button>
 
                 <div class="progress" id="prog" style="display:none">
                     <div class="bar" id="bar"></div>
